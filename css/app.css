@@ -1,0 +1,110 @@
+body {
+  overflow-y:scroll;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.row {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+[class*="col-"] {
+       margin-top:2px;
+    margin-bottom:2px;
+}
+#poolPlayers {
+    min-height:400px;
+}
+
+
+@media screen and (min-width: 768px) {
+  .modal-lg{
+      width:900px;
+  }
+
+  .modal-sm{
+      width:300px;
+  }
+}
+#savedHistory, #players {
+    overflow-y:scroll;
+    overflow-x:hidden;
+}
+#poolsNextToPlayers {
+    overflow-y:scroll;
+    overflow-x:hidden;
+}
+#generatedDrafts {
+    overflow-y:scroll;
+    overflow-x:hidden;
+}
+#messages {
+    height:50px;
+}
+.btn-group{
+     display: table;
+}
+.panel-body {
+    padding:5px;
+    padding-top:2px;
+}
+.fake-link {
+  cursor:pointer;
+  text-decoration: underline;
+  color: #337ab7;
+}
+.actualPoints {
+  height: 22px;
+  max-width:55px;
+ padding: 2px 5px;
+ font-size: 12px;
+ line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+ border-radius: 3px;
+}
+
+/**
+ * The CSS shown here will not be introduced in the Quickstart guide, but shows
+ * how you can use CSS to style your Element's container.
+ */
+.StripeElement {
+  background-color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+.input-group-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
