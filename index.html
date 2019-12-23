@@ -24,6 +24,11 @@
 
 <div ng-app="NBAApp">
     <div class="container" ng-controller="NBAToolController as nba">
+      <div class="row">
+        <div class="col-xs-12 text-center">
+          <h1>AwesemoMinutes</h1>
+        </div>
+      </div>
 
         <div class="row">
             <div class="col-xs-12">
@@ -114,8 +119,8 @@
                               <tbody>
                                 <tr  ng-repeat="singlePlayer in AllPlayers ">
                                   <td>{{singlePlayer.PlayerName}}</td>
-                                  <td>{{(singlePlayer.PlayerPerMinFDPoints * singlePlayer.PlayerMinutes).toFixed(2)}}</td>
-                                  <td>{{(singlePlayer.PlayerPerMinDKPoints * singlePlayer.PlayerMinutes).toFixed(2)}}</td>
+                                  <td>{{singlePlayer.PlayerFDPoints.toFixed(2)}}</td>
+                                  <td>{{singlePlayer.PlayerDKPoints.toFixed(2)}}</td>
                                   <td>{{singlePlayer.PlayerMinutes}}</td>
                                   <td>{{singlePlayer.PlayerOwnership}}</td>
                                 </tr>
@@ -143,6 +148,11 @@
                             <h3 class="panel-title">Load Saved History</h3>
                           </div>
                           <div class="panel-body" set-height id="savedHistory">
+                            <div class="row">
+                              <div class="col-xs-12">
+                                IMPORTANT: Data is saved locally on your computer. Specifically within your browser. If you were to clear the cache, you would lose any saved data.
+                              </div>
+                            </div>
                             <div class="row">
                               <div class="col-xs-12">
                                 <table class="table table-hover">
@@ -177,7 +187,12 @@
             </div>
         </div>
 
-
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <p>This website is not affiliated with <a href="https://Awesemo.com">awesemo.com</a> in any way. Its simply user created content.</p>
+            <p>You can find the project on github at: <a href="https://github.com/MetalBurning/AwesemoMinutes">MetalBurning's Github</a>
+          </div>
+        </div>
 
 
     </div>

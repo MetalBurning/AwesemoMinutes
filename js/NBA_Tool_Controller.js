@@ -123,11 +123,6 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
               }
 
               var PlayerFDPoints = ((PlayerPoints * 1) + (PlayerRebounds * 1.2) + (PlayerAssists * 1.5) + (PlayerSteals * 3) + (PlayerBlocks * 3) + (PlayerTurnovers * -1));
-              var PlayerPerMinFDPoints = 0;
-              if(PlayerMinutes !== 0) {
-                PlayerPerMinFDPoints = PlayerFDPoints / PlayerMinutes;
-              }
-
 
               var DoubleDouble = 0;
               if((PlayerPoints >= 10 && PlayerRebounds >= 10) || (PlayerPoints >= 10 && PlayerAssists >= 10) || (PlayerRebounds >= 10 && PlayerAssists >= 10)) {
@@ -139,53 +134,45 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
               }
 
               var PlayerDKPoints = ((PlayerPoints * 1) + (PlayerThrees * 0.5)+ (PlayerRebounds * 1.25) + (PlayerAssists * 1.5) + (PlayerSteals * 2) + (PlayerBlocks * 2) + (PlayerTurnovers * -0.5) + (DoubleDouble * 1.5) + (TripleDouble * 3));
-              var PlayerPerMinDKPoints = 0;
-              if(PlayerMinutes !== 0) {
-                PlayerPerMinDKPoints = PlayerDKPoints / PlayerMinutes;
+
+              if(PlayerMinutes > 0) {
+                $scope.AllPlayers.push({
+                  PlayerName : PlayerName,
+                  PlayerTeam : PlayerTeam,
+                  PlayerOpp : "",
+                  PlayerOriginalMinutes : PlayerMinutes,
+                  PlayerMinutes : PlayerMinutes,
+                  PlayerOriginalPoints : PlayerPoints,
+                  PlayerPoints : PlayerPoints,
+                  PlayerOriginalThrees : PlayerThrees,
+                  PlayerThrees : PlayerThrees,
+                  PlayerOriginalRebounds : PlayerRebounds,
+                  PlayerRebounds : PlayerRebounds,
+                  PlayerOriginalAssists : PlayerAssists,
+                  PlayerAssists : PlayerAssists,
+                  PlayerOriginalSteals : PlayerSteals,
+                  PlayerSteals : PlayerSteals,
+                  PlayerOriginalBlocks : PlayerBlocks,
+                  PlayerBlocks : PlayerBlocks,
+                  PlayerOriginalTurnovers : PlayerTurnovers,
+                  PlayerTurnovers : PlayerTurnovers,
+                  PlayerFDPoints : PlayerFDPoints,
+                  PlayerDKPoints : PlayerDKPoints,
+                  PlayerPosition : "",
+                  PlayerOwnership : 0,
+                  PlayerSalary : 0,
+                  AdjustedOwnership : 0,
+                  Over : 0
+                });
               }
 
-              $scope.AllPlayers.push({
-                PlayerName : PlayerName,
-                PlayerTeam : PlayerTeam,
-                PlayerOpp : "",
-                PlayerOriginalMinutes : PlayerMinutes,
-                PlayerMinutes : PlayerMinutes,
-                PlayerOriginalPoints : PlayerPoints,
-                PlayerPoints : PlayerPoints,
-                PlayerOriginalThrees : PlayerThrees,
-                PlayerThrees : PlayerThrees,
-                PlayerOriginalRebounds : PlayerRebounds,
-                PlayerRebounds : PlayerRebounds,
-                PlayerOriginalAssists : PlayerAssists,
-                PlayerAssists : PlayerAssists,
-                PlayerOriginalSteals : PlayerSteals,
-                PlayerSteals : PlayerSteals,
-                PlayerOriginalBlocks : PlayerBlocks,
-                PlayerBlocks : PlayerBlocks,
-                PlayerOriginalTurnovers : PlayerTurnovers,
-                PlayerTurnovers : PlayerTurnovers,
-                PlayerFDPoints : PlayerFDPoints,
-                PlayerPerMinFDPoints : PlayerPerMinFDPoints,
-                PlayerPerMinFDPointsCopy : PlayerPerMinFDPoints,
-                PlayerDKPoints : PlayerDKPoints,
-                PlayerPerMinDKPoints : PlayerPerMinDKPoints,
-                PlayerPerMinDKPointsCopy : PlayerPerMinDKPoints,
-                PlayerPosition : "",
-                PlayerOwnership : 0,
-                PlayerSalary : 0,
-                AdjustedOwnership : 0,
-                Over : 0
-              });
             }
         }
 
         $scope.statsLoaded = true;
 
-        $scope.$apply(function() {
-          $scope.displayNewMessage("success", "Player projections file loaded succesfully");
-        });
-
         reader.readAsText(file);
+        $scope.$apply();
     }
 
     $scope.loadOwnership = function (event) {
@@ -248,7 +235,11 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
                         player.PlayerTeam = PlayerTeam;
                         player.PlayerOpp = PlayerOpp;
                         player.PlayerOwnership = PlayerOwnership;
-                        player.PlayerValue = (((player.PlayerPerMinFDPoints * player.PlayerMinutes) / player.PlayerSalary) * 1000);
+
+                        if(player.PlayerMinutes > 0) {
+                          $scope.updatePlayerMinutes(player.PlayerName);
+                        }
+
                         if(player.AdjustedOwnership === 0) {
                           player.AdjustedOwnership = player.PlayerOwnership
                         }
@@ -339,7 +330,7 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
     $scope.getMaxValue = function() {
       var currentMax = 0;
       $scope.AllPlayers.forEach(function (player) {
-          if(player.PlayerValue > currentMax) {
+          if(player.PlayerValue > currentMax && isFinite(player.PlayerValue)) {
             currentMax = player.PlayerValue;
           }
       });
@@ -438,7 +429,7 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
         AllPlayers : $scope.AllPlayers,
         AllTeams : $scope.AllTeams
       }
-      localStorage.setItem("DFSCOMBINE_" + $scope.Title, JSON.stringify(mainObj));
+      localStorage.setItem("AwesemoMinutes_" + $scope.Title, JSON.stringify(mainObj));
     }
 
     $scope.read = function(title) {
@@ -451,28 +442,8 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
 
           //rebuild projections
           $scope.AllPlayers.forEach(function(singlePlayer) {
-            var PlayerFDPoints = ((singlePlayer.PlayerPoints * 1) + (singlePlayer.PlayerRebounds * 1.2) + (singlePlayer.PlayerAssists * 1.5) + (singlePlayer.PlayerSteals * 3) + (singlePlayer.PlayerBlocks * 3) + (singlePlayer.PlayerTurnovers * -1));
-            var PlayerPerMinFDPoints = 0;
-            singlePlayer.PlayerFDPoints = PlayerFDPoints;
-            if(singlePlayer.PlayerMinutes !== 0) {
-              singlePlayer.PlayerPerMinFDPoints = PlayerFDPoints / singlePlayer.PlayerMinutes;
-            }
-
-
-            var DoubleDouble = 0;
-            if((singlePlayer.PlayerPoints >= 10 && singlePlayer.PlayerRebounds >= 10) || (singlePlayer.PlayerPoints >= 10 && singlePlayer.PlayerAssists >= 10) || (singlePlayer.PlayerRebounds >= 10 && singlePlayer.PlayerAssists >= 10)) {
-              DoubleDouble = 1;
-            }
-            var TripleDouble = 0;
-            if((singlePlayer.PlayerPoints >= 10 && singlePlayer.PlayerRebounds >= 10 && singlePlayer.PlayerAssists >= 10)) {
-              TripleDouble = 1;
-            }
-            singlePlayer.PlayerDKPoints = PlayerDKPoints;
-
-            var PlayerDKPoints = ((singlePlayer.PlayerPoints * 1) + (singlePlayer.PlayerThrees * 0.5)+ (singlePlayer.PlayerRebounds * 1.25) + (singlePlayer.PlayerAssists * 1.5) + (singlePlayer.PlayerSteals * 2) + (singlePlayer.PlayerBlocks * 2) + (singlePlayer.PlayerTurnovers * -0.5) + (DoubleDouble * 1.5) + (TripleDouble * 3));
-            var PlayerPerMinDKPoints = 0;
-            if(singlePlayer.PlayerMinutes !== 0) {
-              singlePlayer.PlayerPerMinDKPoints = PlayerDKPoints / singlePlayer.PlayerMinutes;
+            if(singlePlayer.PlayerMinutes > 0) {
+              $scope.updatePlayerMinutes(singlePlayer.PlayerName);
             }
           });
 
@@ -491,7 +462,7 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
     $scope.loadPastSettings = function() {
       $scope.savedPastSettings = [];
       for(var i in localStorage) {
-        if(i.includes("DFSCOMBINE")) {
+        if(i.includes("AwesemoMinutes")) {
           $scope.savedPastSettings.push(JSON.parse(localStorage[i]));
         }
         //console.log(localStorage[i]);
