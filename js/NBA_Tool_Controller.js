@@ -307,7 +307,95 @@ angular.module('NBAApp').controller('NBAToolController', [ '$scope', '$filter', 
 
       link.click();
     }
+    $scope.DownloadModifiedDKProjections = function() {
+      var rows = [];
+      $scope.AllPlayers.forEach(function(singlePlayer){
 
+        var Points_Per_Min = singlePlayer.PlayerOriginalPoints / singlePlayer.PlayerOriginalMinutes;
+        var Threes_Per_Min = singlePlayer.PlayerOriginalThrees / singlePlayer.PlayerOriginalMinutes;
+        var Rebounds_Per_Min = singlePlayer.PlayerOriginalRebounds / singlePlayer.PlayerOriginalMinutes;
+        var Assists_Per_Min = singlePlayer.PlayerOriginalAssists / singlePlayer.PlayerOriginalMinutes;
+        var Steals_Per_Min = singlePlayer.PlayerOriginalSteals / singlePlayer.PlayerOriginalMinutes;
+        var Blocks_Per_Min = singlePlayer.PlayerOriginalBlocks / singlePlayer.PlayerOriginalMinutes;
+        var Turnovers_Per_Min = singlePlayer.PlayerOriginalTurnovers / singlePlayer.PlayerOriginalMinutes;
+
+        var New_Points = Points_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Threes = Threes_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Rebounds = Rebounds_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Assists = Assists_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Steal = Steals_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Blocks = Blocks_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Turnovers = Turnovers_Per_Min * singlePlayer.PlayerMinutes;
+
+        //Calculate DK Projection
+        var DoubleDouble = 0;
+        if((New_Points >= 10 && New_Rebounds >= 10) || (New_Points >= 10 && New_Assists >= 10) || (New_Rebounds >= 10 && New_Assists >= 10)) {
+          DoubleDouble = 1;
+        }
+        var TripleDouble = 0;
+        if((New_Points >= 10 && New_Rebounds >= 10 && New_Assists >= 10)) {
+          TripleDouble = 1;
+        }
+
+        var PlayerDKPoints = ((New_Points * 1) + (New_Threes * 0.5)+ (New_Rebounds * 1.25) + (New_Assists * 1.5) + (New_Steal * 2) + (New_Blocks * 2) + (New_Turnovers * -0.5) + (DoubleDouble * 1.5) + (TripleDouble * 3));
+        singlePlayer.PlayerDKPoints = PlayerDKPoints;
+
+        rows.push(singlePlayer.PlayerName +","+ singlePlayer.PlayerDKPoints.toFixed(3) +",");
+      });
+      var csvContent = "data:text/csv;charset=utf-8,";
+
+      csvContent += "Name,DK Projection\r\n";
+      rows.forEach(function(rowArray) {
+          csvContent += rowArray + "\r\n";
+      });
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "MODIFIED_Awesemo_DK_Projections.csv");
+      document.body.appendChild(link); // Required for FF
+
+      link.click();
+    }
+    $scope.DownloadModifiedFDProjections = function() {
+      var rows = [];
+      $scope.AllPlayers.forEach(function(singlePlayer){
+
+        var Points_Per_Min = singlePlayer.PlayerOriginalPoints / singlePlayer.PlayerOriginalMinutes;
+        var Threes_Per_Min = singlePlayer.PlayerOriginalThrees / singlePlayer.PlayerOriginalMinutes;
+        var Rebounds_Per_Min = singlePlayer.PlayerOriginalRebounds / singlePlayer.PlayerOriginalMinutes;
+        var Assists_Per_Min = singlePlayer.PlayerOriginalAssists / singlePlayer.PlayerOriginalMinutes;
+        var Steals_Per_Min = singlePlayer.PlayerOriginalSteals / singlePlayer.PlayerOriginalMinutes;
+        var Blocks_Per_Min = singlePlayer.PlayerOriginalBlocks / singlePlayer.PlayerOriginalMinutes;
+        var Turnovers_Per_Min = singlePlayer.PlayerOriginalTurnovers / singlePlayer.PlayerOriginalMinutes;
+
+        var New_Points = Points_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Threes = Threes_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Rebounds = Rebounds_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Assists = Assists_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Steal = Steals_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Blocks = Blocks_Per_Min * singlePlayer.PlayerMinutes;
+        var New_Turnovers = Turnovers_Per_Min * singlePlayer.PlayerMinutes;
+
+        //Calculate FD Projection
+        var PlayerFDPoints = ((New_Points * 1) + (New_Rebounds * 1.2) + (New_Assists * 1.5) + (New_Steal * 3) + (New_Blocks * 3) + (New_Turnovers * -1));
+        singlePlayer.PlayerFDPoints = PlayerFDPoints;
+
+        rows.push(singlePlayer.PlayerName +","+ singlePlayer.PlayerFDPoints.toFixed(3) +",");
+      });
+      var csvContent = "data:text/csv;charset=utf-8,";
+
+      csvContent += "Name,FD Projection\r\n";
+      rows.forEach(function(rowArray) {
+          csvContent += rowArray + "\r\n";
+      });
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "MODIFIED_Awesemo_FD_Projections.csv");
+      document.body.appendChild(link); // Required for FF
+
+      link.click();
+    }
     $scope.calcPositionMins = function(team, position) {
       var sumMin = 0;
       $scope.AllPlayers.forEach(function (player) {

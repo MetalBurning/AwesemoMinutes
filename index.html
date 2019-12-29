@@ -34,175 +34,194 @@
 <body>
 
 <div ng-app="NBAApp">
-    <div class="container" ng-controller="NBAToolController as nba">
+    <div class="container-fluid" ng-controller="NBAToolController as nba">
       <div class="row">
         <div class="col-xs-12 text-center">
           <h1>AwesemoMinutes</h1>
         </div>
       </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <h4>Tutorial</h4>
+          <ol>
+            <li>Upload the "Projected Stats" file that awesemo provides.</li>
+            <li>Upload the Ownership file (DK or FD) that awesemo provides.</li>
+            <li>Modify minutes as you see fit.</li>
+            <li>Scroll to the bottom of the main page and download the modified "Projected Stats" file. Your changes will be reflected within this file. Or copy your changes in the table displayed at the bottom.</li>
+            <li>Save your changes to your browser via the save icon on the Database tab. (upper right corner)</li>
+            <li>Profit!</li>
+
+          </ol>
+        </div>
+
+        <div class="col-sm-8">
+            <uib-tabset active="activeJustified" justified="true">
+                <uib-tab index="1" heading="{{Title}}">
+                  <div class"row" ng-if="AllTeams.length === 0">
+                    <div class="col-xs-12 text-center">
+                      <label class="btn btn-primary btn-file btn-lg">
+                          Add Awesemo Projected Stats File (1st)<input type="file" style="display: none;" custom-on-change="loadProjections">
+                      </label>
+                      <label class="btn btn-primary btn-file btn-lg" ng-disabled="!statsLoaded" >
+                          Add Awesemo Ownership File (2nd)<input type="file" style="display: none;" ng-disabled="!statsLoaded" custom-on-change="loadOwnership">
+                      </label>
+                    </div>
+                    <div class="col-xs-12 text-center" ng-show="!statsLoaded" >
+                      No data currently loaded. Please load awesemo projected stats file.
+                    </div>
+                    <div class="col-xs-12 text-center" ng-show="statsLoaded" >
+                      Awesemo projected stats currently loaded. Please load awesemo ownership file. (DK or FD)
+                    </div>
+                  </div>
+
+                  <div class="row" ng-repeat="singleTeam in AllTeams" >
+                    <div class="col-xs-12">
+                        <table class="table table-bordered">
+                          <thead>
+                            <th>{{singleTeam}}</th>
+                            <th>FD Proj</th>
+                            <th>DK Proj</th>
+                            <th>Salary</th>
+                            <th>Value</th>
+                            <th>Proj Own</th>
+                            <th>PG</th>
+                            <th>SG</th>
+                            <th>SF</th>
+                            <th>PF</th>
+                            <th>C</th>
+                          </thead>
+                          <tbody>
+                            <tr  ng-repeat="singlePlayer in AllPlayers |playersOnTeam:(singleTeam)">
+                              <td>{{singlePlayer.PlayerName}}</td>
+                              <td>{{singlePlayer.PlayerFDPoints.toFixed(2)}}</td>
+                              <td>{{singlePlayer.PlayerDKPoints.toFixed(2)}}</td>
+                              <td>{{singlePlayer.PlayerSalary}}</td>
+
+
+                              <td style="background-color: {{ getGradientColor(0, getMaxValue(), singlePlayer.PlayerValue) }}">{{singlePlayer.PlayerValue.toFixed(2)}}</td>
+                              <td style="background-color: {{ getGradientColor(0, getMaxOwnership(), singlePlayer.PlayerOwnership) }}">{{singlePlayer.PlayerOwnership.toFixed(1)}}</td>
+
+
+                              <td ng-if="singlePlayer.PlayerPosition.includes('PG')" ><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
+                              <td ng-if="!singlePlayer.PlayerPosition.includes('PG')">-</td>
+
+                              <td ng-if="singlePlayer.PlayerPosition.includes('SG')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
+                              <td ng-if="!singlePlayer.PlayerPosition.includes('SG')">-</td>
+
+                              <td ng-if="singlePlayer.PlayerPosition.includes('SF')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
+                              <td ng-if="!singlePlayer.PlayerPosition.includes('SF')">-</td>
+
+                              <td ng-if="singlePlayer.PlayerPosition.includes('PF')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
+                              <td ng-if="!singlePlayer.PlayerPosition.includes('PF')">-</td>
+
+                              <td ng-if="singlePlayer.PlayerPosition.includes('C')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
+                              <td ng-if="!singlePlayer.PlayerPosition.includes('C')">-</td>
+                            </tr>
+                            <tr>
+                              <th>Total Team Minutes</th>
+                                <th>{{ calcMins(singleTeam) }}</th>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                  </div>
+
+                  <div class="row" ng-if="AllTeams.length > 0 ">
+                    <div class="col-xs-12 text-center">
+                      <button class="btn btn-primary btn-file btn-lg" ng-click="DownloadModifiedFile()">Download modified minutes file</button>
+                      <button class="btn btn-primary btn-file btn-lg" ng-click="DownloadModifiedDKProjections()">Download DK Projections</button>
+                      <button class="btn btn-primary btn-file btn-lg" ng-click="DownloadModifiedFDProjections()">Download FD Projections</button>
+                    </div>
+                    <div class="col-xs-12">
+                        <table class="table table-bordered">
+                          <thead>
+                            <th>Name</th>
+                            <th>FD Proj</th>
+                            <th>DK Proj</th>
+                            <th>Minutes</th>
+                            <th>Ownership</th>
+                          </thead>
+                          <tbody>
+                            <tr  ng-repeat="singlePlayer in AllPlayers ">
+                              <td>{{singlePlayer.PlayerName}}</td>
+                              <td>{{singlePlayer.PlayerFDPoints.toFixed(2)}}</td>
+                              <td>{{singlePlayer.PlayerDKPoints.toFixed(2)}}</td>
+                              <td>{{singlePlayer.PlayerMinutes}}</td>
+                              <td>{{singlePlayer.PlayerOwnership}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+
+                  </div>
+                </uib-tab>
+                <uib-tab  index="2" heading="DataBase" ng-click="loadPastSettings()">
+
+                  <div class="panel panel-default" >
+                      <div class="panel-heading">
+                        <div class='btn-toolbar pull-right'>
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-xs btn-primary" ng-disabled="_AllPlayers.length == 0" ng-click="save()" ><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
+                          </div>
+                          <label class="btn btn-primary btn-file btn-xs">
+                              Add Projections File (1st)<input type="file" style="display: none;" custom-on-change="loadProjections">
+                          </label>
+                          <label class="btn btn-primary btn-file btn-xs" ng-disabled="!statsLoaded" >
+                              Add Ownership File (2nd)<input type="file" style="display: none;" custom-on-change="loadOwnership">
+                          </label>
+                        </div>
+                        <h3 class="panel-title">Load Saved History</h3>
+                      </div>
+                      <div class="panel-body" set-height id="savedHistory">
+                        <div class="row">
+                          <div class="col-xs-12">
+                            IMPORTANT: Data is saved locally on your computer. Specifically within your browser. If you were to clear the cache, you would lose any saved data.
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Settings #</th>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Load</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="savedSettings in savedPastSettings | orderBy: '-Date'">
+                                  <tr>
+                                    <td class="col-md-1">{{$index+1}}</td>
+                                    <td class="col-md-3"><input class="form-control" type="text" ng-model="savedSettings.Title"></td>
+                                    <td class="col-md-2">{{savedSettings.Date}}</td>
+                                    <td class="col-md-4">
+                                      <button class="btn btn-sm btn-primary" ng-click="read(savedSettings.Title)">Load</button>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                          </div>
+                        </div>
+
+                      </div>
+                  </div>
+
+
+                </uib-tab>
+            </uib-tabset>
+        </div>
+
+      </div>
 
         <div class="row">
-            <div class="col-xs-12">
-                <uib-tabset active="activeJustified" justified="true">
-                    <uib-tab index="1" heading="{{Title}}">
-                      <div class"row" ng-if="AllTeams.length === 0">
-                        <div class="col-xs-12 text-center">
-                          <label class="btn btn-primary btn-file btn-lg">
-                              Add Awesemo Projected Stats File (1st)<input type="file" style="display: none;" custom-on-change="loadProjections">
-                          </label>
-                          <label class="btn btn-primary btn-file btn-lg" ng-disabled="!statsLoaded" >
-                              Add Awesemo Ownership File (2nd)<input type="file" style="display: none;" ng-disabled="!statsLoaded" custom-on-change="loadOwnership">
-                          </label>
-                        </div>
-                        <div class="col-xs-12 text-center" ng-show="!statsLoaded" >
-                          No data currently loaded. Please load awesemo projected stats file.
-                        </div>
-                        <div class="col-xs-12 text-center" ng-show="statsLoaded" >
-                          Awesemo projected stats currently loaded. Please load awesemo ownership file. (DK or FD)
-                        </div>
-                      </div>
 
-                      <div class="row" ng-repeat="singleTeam in AllTeams" >
-                        <div class="col-xs-12">
-                            <table class="table table-bordered">
-                              <thead>
-                                <th>{{singleTeam}}</th>
-                                <th>FD Proj</th>
-                                <th>DK Proj</th>
-                                <th>Salary</th>
-                                <th>Value</th>
-                                <th>Proj Own</th>
-                                <th>PG</th>
-                                <th>SG</th>
-                                <th>SF</th>
-                                <th>PF</th>
-                                <th>C</th>
-                              </thead>
-                              <tbody>
-                                <tr  ng-repeat="singlePlayer in AllPlayers |playersOnTeam:(singleTeam)">
-                                  <td>{{singlePlayer.PlayerName}}</td>
-                                  <td>{{singlePlayer.PlayerFDPoints.toFixed(2)}}</td>
-                                  <td>{{singlePlayer.PlayerDKPoints.toFixed(2)}}</td>
-                                  <td>{{singlePlayer.PlayerSalary}}</td>
-
-
-                                  <td style="background-color: {{ getGradientColor(0, getMaxValue(), singlePlayer.PlayerValue) }}">{{singlePlayer.PlayerValue.toFixed(2)}}</td>
-                                  <td style="background-color: {{ getGradientColor(0, getMaxOwnershipPosition(singlePlayer.PlayerPosition), singlePlayer.PlayerOwnership) }}">{{singlePlayer.PlayerOwnership.toFixed(1)}}</td>
-
-
-                                  <td ng-if="singlePlayer.PlayerPosition.includes('PG')" ><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
-                                  <td ng-if="!singlePlayer.PlayerPosition.includes('PG')">-</td>
-
-                                  <td ng-if="singlePlayer.PlayerPosition.includes('SG')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
-                                  <td ng-if="!singlePlayer.PlayerPosition.includes('SG')">-</td>
-
-                                  <td ng-if="singlePlayer.PlayerPosition.includes('SF')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
-                                  <td ng-if="!singlePlayer.PlayerPosition.includes('SF')">-</td>
-
-                                  <td ng-if="singlePlayer.PlayerPosition.includes('PF')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
-                                  <td ng-if="!singlePlayer.PlayerPosition.includes('PF')">-</td>
-
-                                  <td ng-if="singlePlayer.PlayerPosition.includes('C')"><input class="form-control actualPoints"  ng-model="singlePlayer.PlayerMinutes" type="number" ng-change="updatePlayerMinutes(singlePlayer.PlayerName)" ></td>
-                                  <td ng-if="!singlePlayer.PlayerPosition.includes('C')">-</td>
-                                </tr>
-                                <tr>
-                                  <th>Total Team Minutes</th>
-                                    <th>{{ calcMins(singleTeam) }}</th>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
-                      </div>
-
-                      <div class="row" ng-if="AllTeams.length > 0 ">
-                        <div class="col-xs-12 text-center">
-                          <button class="btn btn-primary btn-file btn-lg" ng-click="DownloadModifiedFile()">Download modified minutes file</button>
-                        </div>
-                        <div class="col-xs-12">
-                            <table class="table table-bordered">
-                              <thead>
-                                <th>Name</th>
-                                <th>FD Proj</th>
-                                <th>DK Proj</th>
-                                <th>Minutes</th>
-                                <th>Ownership</th>
-                              </thead>
-                              <tbody>
-                                <tr  ng-repeat="singlePlayer in AllPlayers ">
-                                  <td>{{singlePlayer.PlayerName}}</td>
-                                  <td>{{singlePlayer.PlayerFDPoints.toFixed(2)}}</td>
-                                  <td>{{singlePlayer.PlayerDKPoints.toFixed(2)}}</td>
-                                  <td>{{singlePlayer.PlayerMinutes}}</td>
-                                  <td>{{singlePlayer.PlayerOwnership}}</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                        </div>
-
-                      </div>
-                    </uib-tab>
-                    <uib-tab  index="2" heading="DataBase" ng-click="loadPastSettings()">
-
-                      <div class="panel panel-default" >
-                          <div class="panel-heading">
-                            <div class='btn-toolbar pull-right'>
-                              <div class="btn-group">
-                                <button type="button" class="btn btn-xs btn-primary" ng-disabled="_AllPlayers.length == 0" ng-click="save()" ><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
-                              </div>
-                              <label class="btn btn-primary btn-file btn-xs">
-                                  Add Projections File (1st)<input type="file" style="display: none;" custom-on-change="loadProjections">
-                              </label>
-                              <label class="btn btn-primary btn-file btn-xs" ng-disabled="!statsLoaded" >
-                                  Add Ownership File (2nd)<input type="file" style="display: none;" custom-on-change="loadOwnership">
-                              </label>
-                            </div>
-                            <h3 class="panel-title">Load Saved History</h3>
-                          </div>
-                          <div class="panel-body" set-height id="savedHistory">
-                            <div class="row">
-                              <div class="col-xs-12">
-                                IMPORTANT: Data is saved locally on your computer. Specifically within your browser. If you were to clear the cache, you would lose any saved data.
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="col-xs-12">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Settings #</th>
-                                            <th>Title</th>
-                                            <th>Date</th>
-                                            <th>Load</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody ng-repeat="savedSettings in savedPastSettings | orderBy: '-Date'">
-                                      <tr>
-                                        <td class="col-md-1">{{$index+1}}</td>
-                                        <td class="col-md-3"><input class="form-control" type="text" ng-model="savedSettings.Title"></td>
-                                        <td class="col-md-2">{{savedSettings.Date}}</td>
-                                        <td class="col-md-4">
-                                          <button class="btn btn-sm btn-primary" ng-click="read(savedSettings.Title)">Load</button>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                              </div>
-                            </div>
-
-                          </div>
-                      </div>
-
-
-                    </uib-tab>
-                </uib-tabset>
-            </div>
         </div>
 
         <div class="row">
           <div class="col-xs-12 text-center">
             <p>This website is not affiliated with <a href="https://Awesemo.com">awesemo.com</a> in any way. Its simply user created content.</p>
             <p>You can find the project/tutorial on github at: <a href="https://github.com/MetalBurning/AwesemoMinutes">MetalBurning's Github</a></p>
-            <p>If you'd like to report a bug/feature feel free to dm me on twitter <a href="https://twitter.com/Metal_burning">@Metalburning</a>!</p>
+            <p>If you'd like to report a bug/feature feel free to dm me on twitter <a href="https://twitter.com/Metal_burning">@Metal_burning</a>!</p>
           </div>
         </div>
 

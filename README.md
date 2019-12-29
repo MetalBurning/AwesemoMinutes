@@ -7,7 +7,7 @@ You can find sample files in the sample directory.
 
 You can find the SPA here: https://metalburning.github.io/AwesemoMinutes/
 
-Slight disclaimer: Awesemo's DK projection is slightly different, this is most likely due to how they project double doubles/triple doubles. This web-app just looks for if a player is projected for a double double or triple double and awards the points if theyre projected or not.
+Slight disclaimer: Awesemo's DK projection is slightly different, this is most likely due to how they project double doubles/triple doubles. This web-app just looks for if a player is projected for a double double or triple double and awards the points if they're projected or not.
 
 Tutorial:
 
