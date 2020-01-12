@@ -34,7 +34,7 @@
 <body>
 
 <div ng-app="NBAApp">
-    <div class="container-fluid" ng-controller="NBAToolController as nba">
+    <div class="container-fluid" ng-controller="NBAToolController as nba" data-ng-init="loadSampleData()">
       <div class="row">
         <div class="col-xs-12 text-center">
           <h1>AwesemoMinutes</h1>
@@ -44,8 +44,8 @@
         <div class="col-sm-2">
           <h4>Tutorial</h4>
           <ol>
-            <li>Upload the "Projected Stats" file that awesemo provides.</li>
-            <li>Upload the Ownership file (DK or FD) that awesemo provides.</li>
+            <li>Upload the "Projected Stats" .CSV file that awesemo provides.</li>
+            <li>Upload the Ownership file (DK or FD) .CSV that awesemo provides.</li>
             <li>Modify minutes as you see fit.</li>
             <li>Scroll to the bottom of the main page and download the modified "Projected Stats" file. Your changes will be reflected within this file. Or copy your changes in the table displayed at the bottom.</li>
             <li>Save your changes to your browser via the save icon on the Database tab. (upper right corner)</li>
@@ -61,7 +61,7 @@
         <div class="col-sm-8">
             <uib-tabset active="activeJustified" justified="true">
                 <uib-tab index="1" heading="{{Title}}">
-                  <div class"row" ng-if="AllTeams.length === 0">
+                  <div class"row">
                     <div class="col-xs-12 text-center">
                       <label class="btn btn-primary btn-file btn-lg">
                           Add Awesemo Projected Stats File (1st)<input type="file" style="display: none;" custom-on-change="loadProjections">
@@ -70,10 +70,13 @@
                           Add Awesemo Ownership File (2nd)<input type="file" style="display: none;" ng-disabled="!statsLoaded" custom-on-change="loadOwnership">
                       </label>
                     </div>
-                    <div class="col-xs-12 text-center" ng-show="!statsLoaded" >
+                    <div class="col-xs-12 text-center" ng-show="sampleData && !statsLoaded" >
+                      Sample data currently loaded. Please load awesemo projected stats file.
+                    </div>
+                    <div class="col-xs-12 text-center" ng-show="!statsLoaded && !sampleData" >
                       No data currently loaded. Please load awesemo projected stats file.
                     </div>
-                    <div class="col-xs-12 text-center" ng-show="statsLoaded" >
+                    <div class="col-xs-12 text-center" ng-show="statsLoaded && !OwnershipLoaded" >
                       Awesemo projected stats currently loaded. Please load awesemo ownership file. (DK or FD)
                     </div>
                   </div>
